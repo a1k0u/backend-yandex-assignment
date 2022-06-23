@@ -16,3 +16,6 @@ install:
 
 freeze:
 	$(PIP) freeze > requirements.txt
+
+database:
+	touch db/db.sqlite

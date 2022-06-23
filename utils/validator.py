@@ -9,7 +9,7 @@ def validate_time(time: str) -> bool:
     return True
 
 
-def validate_item(item: dict) -> bool:
+def validate_item(item) -> bool:
     if item["name"] is None:
         return False
 
@@ -22,7 +22,7 @@ def validate_item(item: dict) -> bool:
     return True
 
 
-def validate_import(data: dict) -> bool:
+def validate_import(data) -> bool:
     if not validate_time(data.get("updateDate", "")):
         return False
 
