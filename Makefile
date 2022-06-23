@@ -18,4 +18,10 @@ freeze:
 	$(PIP) freeze > requirements.txt
 
 database:
-	touch db/db.sqlite
+	touch db.sqlite
+
+docker_build:
+	docker build -t basic-flask:latest --build-arg APP_IMAGE=python:3.9.5-alpine .
+
+docker_run:
+	docker container run -p 5000:5000 -dit --name flaskApp basic-flask:latest
