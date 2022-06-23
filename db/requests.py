@@ -90,6 +90,17 @@ def delete_item(cursor, uuid):
     return None
 
 
+def take_element(cursor, uuid):
+    cursor.execute(f"""
+        SELECT
+            *
+        FROM 
+            goods
+        WHERE 
+            id='{uuid}'
+    """)
+
+
 def find_by_parent_id(cursor, uuid):
     cursor.execute(f"""
         SELECT

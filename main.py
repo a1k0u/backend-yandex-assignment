@@ -1,6 +1,6 @@
-from utils.validator import validate_import
+from utils.validator import validate_import, validate_uuid
 from utils.models import create_product, Product
-from db.database import import_goods_to_db
+from db.database import import_goods_to_db, delete_goods_from_db
 from db.requests import db_request, check_item
 
 
@@ -21,12 +21,25 @@ def import_goods():
 
 @app.route("/delete/<node_id>", methods=["DELETE"])
 def delete_goods(node_id):
-    if not validate_import(node_id):
+    if not validate_uuid(node_id):
         return jsonify(dict(code=400, message="Validation Failed")), 400
     product = create_product({"id": node_id}, "")
     result = db_request(check_item, product)
     if not result:
         return jsonify(dict(code=404, message="Item not found")), 404
+    delete_goods_from_db(node_id)
+    return jsonify(dict(code=200)), 200
+
+
+@app.route("/nodes/<node_id>", methods=["GET"])
+def import_node(node_id):
+    if not validate_uuid(node_id):
+        return jsonify(dict(code=400, message="Validation Failed")), 400
+    product = create_product({"id": node_id}, "")
+    result = db_request(check_item, product)
+    if not result:
+        return jsonify(dict(code=404, message="Item not found")), 404
+    return 500
 
 
 @app.errorhandler(404)
