@@ -1,4 +1,13 @@
 from datetime import datetime
+from uuid import UUID
+
+
+def validate_uuid(uuid: str) -> bool:
+    try:
+        version = UUID(uuid).version
+    except ValueError:
+        return False
+    return True
 
 
 def validate_time(time: str) -> bool:
@@ -13,7 +22,7 @@ def validate_item(item) -> bool:
     if item["name"] is None:
         return False
 
-    if item["type"] == "OFFER" and item["price"] < 0:
+    if item["type"] == "OFFER" and (item.get("price") is None or item["price"] < 0):
         return False
 
     if item["type"] == "CATEGORY" and item["price"] is not None:
@@ -26,10 +35,10 @@ def validate_import(data) -> bool:
     if not validate_time(data.get("updateDate", "")):
         return False
 
-    uuids = set("_")
+    uuids = {None}
 
     for item in data.get("items", []):
-        if item.get("id", "_") in uuids:
+        if item.get("id", None) in uuids or not validate_uuid(item.get("id", None)):
             return False
         uuids.add(item["id"])
 

@@ -1,8 +1,9 @@
-from typing import NamedTuple
+from dataclasses import dataclass
 import datetime
 
 
-class Product(NamedTuple):
+@dataclass
+class Product:
     uuid: str
     name: str
     group: str
@@ -13,10 +14,10 @@ class Product(NamedTuple):
 
 def create_product(item: dict, time: str) -> Product:
     return Product(
-        uuid=item["id"],
-        name=item["name"],
-        group=item["type"],
-        parent_id=item["parentId"],
-        price=item["price"],
+        uuid=item.get("id", None),
+        name=item.get("name", None),
+        group=item.get("type", None),
+        parent_id=item.get("parentId", None),
+        price=item.get("price", None),
         date=time,
     )

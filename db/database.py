@@ -15,13 +15,28 @@ def import_goods_to_db(items) -> int:
         product = create_product(item, items["updateDate"])
         result = check_item(cursor, product)
 
+        parent = product.uuid
+        product.uuid = product.parent_id
+        if product.uuid is not None and not check_item(cursor, product):
+            code = 400
+            break
+        product.uuid = parent
+
         if not result:
             insert_item(cursor, product)
         else:
-            # TODO: checker
+            status = result[0][1]
+            if status != product.group:
+                code = 400
+                break
+
             update_item(cursor, product)
     else:
         connection.commit()
 
     cursor.close()
     return code
+
+
+def delete_goods():
+    ...
