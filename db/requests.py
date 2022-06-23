@@ -79,6 +79,31 @@ def check_item(cursor, product: Product):
     return cursor.fetchall()
 
 
+def delete_item(cursor, uuid):
+    cursor.execute(f"""
+        DELETE FROM
+            goods
+        WHERE
+            id='{uuid}'
+    """)
+
+    return None
+
+
+def find_by_parent_id(cursor, uuid):
+    cursor.execute(f"""
+        SELECT
+            id,
+            type
+        FROM
+            goods
+        WHERE 
+            parent_id='{uuid}'
+    """)
+
+    return cursor.fetchall()
+
+
 def db_request(request: Callable, *args):
     connection = create_connection()
     if connection is None:
