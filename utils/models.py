@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-import datetime
+from enum import Enum
 
 
 @dataclass
@@ -10,6 +10,11 @@ class Product:
     parent_id: str
     price: int
     date: str
+
+
+class Type(Enum):
+    OFFER = "OFFER"
+    CATEGORY = "CATEGORY"
 
 
 def create_product(item: dict, time: str) -> Product:
