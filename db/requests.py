@@ -1,7 +1,7 @@
 from sqlalchemy import select, insert, delete, update
 
-from objects.models import Product
-from db.tables import Goods
+from objects.variables import Product
+from db.models import Goods
 
 
 def insert_item_into_db(conn, product: Product):

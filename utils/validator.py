@@ -6,8 +6,8 @@ Check ./doc/openapi.yaml.
 from datetime import datetime
 from uuid import UUID
 
-from utils.log import log_validator
-from objects.models import Type
+from utils.logger import log_validator
+from objects.variables import Type
 
 
 def validate_uuid(uuid: str) -> bool:
