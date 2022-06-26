@@ -1,4 +1,5 @@
 from variables import get_env_vars
+from exceptions import DBError
 
 from functools import lru_cache
 from typing import Callable
@@ -20,11 +21,16 @@ def get_engine() -> sqlalchemy.engine.Engine:
 
 
 def connect_to_db(function: Callable):
-    def wrapper(*args):
+    def wrapper(values: dict = None):
         engine = get_engine()
-        with engine.begin() as connection:
-            return function(connection, args)
-
+        try:
+            with engine.begin() as connection:
+                result = function(connection, values)
+                if result[1] != 200:
+                    raise DBError("32!")
+        except DBError:
+            ...
+        return result
     return wrapper
 
 

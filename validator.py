@@ -23,7 +23,7 @@ def validate_time(time: str) -> bool:
 def validate_price(num) -> float:
     try:
         return float(num)
-    except ValueError:
+    except (ValueError, TypeError):
         return -1
 
 
@@ -34,13 +34,13 @@ def validate_item(item) -> bool:
     if item.get("type") is None:
         return False
 
-    if item.get("type") not in (Type.OFFER, Type.CATEGORY):
+    if item.get("type") not in (Type.OFFER.name, Type.CATEGORY.name):
         return False
 
-    if item.get("type") == Type.OFFER and validate_price(item.get("price")) < 0:
+    if item.get("type") == Type.OFFER.name and validate_price(item.get("price")) < 0:
         return False
 
-    if item.get("type") == Type.CATEGORY and item.get("price") is not None:
+    if item.get("type") == Type.CATEGORY.name and item.get("price") is not None:
         return False
 
     return True

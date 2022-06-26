@@ -2,30 +2,16 @@ from typing import Tuple
 
 from validator import validate_import, validate_uuid
 from models import create_product
-from db.database import import_goods_to_db, delete_goods_from_db
-from requests import db_request, check_item_in_db
+from actions import import_goods_to_db, delete_goods_from_db
+import db_requests as req
+from responses import _validation_fail
 
 import flask
 from flask import Flask, jsonify, request, Response
 from json import loads
 
+
 app = Flask(__name__)
-
-
-def _validation_fail() -> Tuple[Response, int]:
-    return jsonify(dict(code=400, message="Validation Failed")), 400
-
-
-def _item_not_found() -> Tuple[Response, int]:
-    return jsonify(dict(code=404, message="Item not found")), 404
-
-
-def _page_not_found() -> Tuple[Response, int]:
-    return jsonify(dict(code=404, message="Page not found")), 404
-
-
-def _send_result_process(code=200) -> Tuple[Response, int]:
-    return jsonify(dict(code=code)), 200
 
 
 def _get_data(req):
@@ -42,9 +28,7 @@ def import_goods():
     if not validate_import(data):
         return _validation_fail()
 
-    code = import_goods_to_db(data)
-
-    return _success_process(code)
+    return import_goods_to_db(data)
 
 
 @app.route("/delete/<node_id>", methods=["DELETE"])
@@ -52,16 +36,7 @@ def delete_goods(node_id):
     if not validate_uuid(node_id):
         return _validation_fail()
 
-    product = create_product({"id": node_id}, "")
-
-    result = db_request(check_item_in_db, product)
-
-    if not result:
-        return _item_not_found()
-
-    delete_goods_from_db(node_id)
-
-    return _success_process()
+    return delete_goods_from_db(node_id)
 
 
 @app.route("/nodes/<node_id>", methods=["GET"])

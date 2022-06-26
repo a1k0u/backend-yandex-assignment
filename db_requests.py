@@ -22,7 +22,7 @@ def insert_item_into_db(conn, product: Product):
 
 def update_item_in_db(conn, product: Product):
     stmt = update(Goods).\
-        where(Goods.c.id_ == product.uuid).\
+        where(Goods.id_ == product.uuid).\
         values(
             id_=product.uuid,
             name_=product.name,
@@ -36,21 +36,21 @@ def update_item_in_db(conn, product: Product):
 
 
 def check_item_in_db(conn, product: Product):
-    stmt = select(Goods.c.id_, Goods.c.type_).where(Goods.c.id_ == product.uuid)
+    stmt = select(Goods.id_, Goods.type_).where(Goods.id_ == product.uuid)
     return conn.execute(stmt).fetchall()
 
 
 def delete_item_from_db(conn, uuid):
-    stmt = delete(Goods).where(Goods.c.id_ == uuid)
+    stmt = delete(Goods).where(Goods.id_ == uuid)
     conn.execute(stmt)
     return None
 
 
 def take_element_by_uuid(conn, uuid):
-    stmt = select(Goods).where(Goods.c.id_ == uuid)
+    stmt = select(Goods).where(Goods.id_ == uuid)
     return conn.execute(stmt).fetchall()
 
 
 def find_by_parent_id(conn, uuid):
-    stmt = select(Goods.c.id_, Goods.c.type_).where(Goods.c.parent_id_ == uuid)
+    stmt = select(Goods.id_, Goods.type_).where(Goods.parent_id_ == uuid)
     return conn.execute(stmt).fetchall()

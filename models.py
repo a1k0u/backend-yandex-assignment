@@ -13,8 +13,8 @@ class Product:
 
 
 class Type(Enum):
-    OFFER = "OFFER"
-    CATEGORY = "CATEGORY"
+    OFFER: str = "OFFER"
+    CATEGORY: str = "CATEGORY"
 
 
 def create_product(item: dict, time: str) -> Product:
