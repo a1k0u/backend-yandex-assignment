@@ -19,7 +19,7 @@ def get_engine() -> sqlalchemy.engine.Engine:
     return engine
 
 
-def connect(function: Callable):
+def connect_to_db(function: Callable):
     def wrapper(*args):
         engine = get_engine()
         with engine.begin() as connection:

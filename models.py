@@ -19,10 +19,10 @@ class Type(Enum):
 
 def create_product(item: dict, time: str) -> Product:
     return Product(
-        uuid=item.get("id", None),
-        name=item.get("name", None),
-        group=item.get("type", None),
-        parent_id=item.get("parentId", None),
-        price=item.get("price", None),
+        uuid=item.get("id"),
+        name=item.get("name"),
+        group=item.get("type"),
+        parent_id=item.get("parentId"),
+        price=item.get("price"),
         date=time,
     )
