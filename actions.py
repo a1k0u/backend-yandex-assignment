@@ -12,8 +12,10 @@ def import_goods_to_db(conn, items):
 
         temporary = product.uuid
         product.uuid = product.parent_id
-        if product.uuid is not None and not req.check_item_in_db(conn, product):
-            return _validation_fail()
+        if product.uuid is not None:
+            element = req.check_item_in_db(conn, product)
+            if not element or element[0][1] == Type.OFFER.name:
+                return _validation_fail()
         product.uuid = temporary
 
         if not result:
@@ -34,14 +36,16 @@ def delete_goods_from_db(conn, node_id):
 
     uuids_to_check = set()
     uuids_to_delete = {node_id}
-    if element[0].type_ == Type.CATEGORY:
-        uuids_to_check.add(element[0].id_)
+
+    element_status, element_uuid = element[0][2], element[0][0]
+    if element_status == Type.CATEGORY.name:
+        uuids_to_check.add(element_uuid)
 
     while uuids_to_check:
         items = req.find_by_parent_id(conn, uuids_to_check.pop())
         for uuid, group in items:
             uuids_to_delete.add(uuid)
-            if group == Type.CATEGORY:
+            if group == Type.CATEGORY.name:
                 uuids_to_check.add(uuid)
 
     for uuid in uuids_to_delete:
