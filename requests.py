@@ -1,5 +1,5 @@
-from utils.models import Product
-from utils.exceptions import DBError
+from models import Product
+from exceptions import DBError
 from typing import Callable
 import os
 
@@ -9,7 +9,7 @@ from sqlite3 import Error
 
 def create_connection():
     try:
-        connection = sqlite3.connect(os.path.abspath("../db.sqlite"))
+        connection = sqlite3.connect(os.path.abspath("db.sqlite"))
     except Error:
         connection = None
     return connection

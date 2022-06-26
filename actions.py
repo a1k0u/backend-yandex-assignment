@@ -1,14 +1,11 @@
-from db.requests import db_request, insert_item, delete_item, update_item, find_by_parent_id,check_item, create_connection
-from utils.models import Product, create_product
-from utils.exceptions import DBError
+import connection
+from requests import db_request, insert_item, delete_item, update_item, find_by_parent_id,check_item, create_connection
+from models import create_product
 
 
-def import_goods_to_db(items) -> int:
+@connection.connect
+def import_goods_to_db(connection, items) -> int:
     code = 200
-
-    connection = create_connection()
-    if connection is None:
-        return 500
     cursor = connection.cursor()
 
     for item in items["items"]:

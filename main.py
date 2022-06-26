@@ -1,7 +1,7 @@
-from utils.validator import validate_import, validate_uuid
-from utils.models import create_product, Product
+from validator import validate_import, validate_uuid
+from models import create_product
 from db.database import import_goods_to_db, delete_goods_from_db
-from db.requests import db_request, check_item
+from requests import db_request, check_item
 
 
 from flask import Flask, jsonify, request

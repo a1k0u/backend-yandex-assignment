@@ -17,11 +17,11 @@ install:
 freeze:
 	$(PIP) freeze > requirements.txt
 
-database:
-	touch db.sqlite
-
 init_tables:
-	$(PYTHON) db/requests.py
+	$(PYTHON) models.py
+
+db_engine:
+	$(PYTHON) connection.py
 
 docker_build:
 	docker build -t basic-flask:latest --build-arg APP_IMAGE=python:3.9.5-alpine .

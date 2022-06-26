@@ -1,6 +1,6 @@
-from db.connection import get_engine
+from connection import get_engine
 
-from sqlalchemy import Column, Integer, String, MetaData
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
