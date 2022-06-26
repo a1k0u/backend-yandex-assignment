@@ -1,5 +1,9 @@
-from variables import get_env_vars
-from exceptions import DBError
+"""
+Creates engine to database by sqlalchemy,
+and decorator for functions, which work with database.
+This decorator creates connection and after success executes
+commits changes or rollback if programme got exceptions.
+"""
 
 from functools import lru_cache
 from typing import Callable
@@ -7,9 +11,13 @@ from typing import Callable
 from sqlalchemy import create_engine
 import sqlalchemy.engine
 
+from variables import get_env_vars
+from exceptions import DBError
+
 
 @lru_cache
 def get_engine() -> sqlalchemy.engine.Engine:
+    """Connecting to a database using env variables."""
     var = get_env_vars()
     print(var)
     engine = create_engine(
@@ -21,16 +29,19 @@ def get_engine() -> sqlalchemy.engine.Engine:
 
 
 def connect_to_db(function: Callable):
+    """Secure connection to the database. Commit if success and rollback if exception."""
+
     def wrapper(values: dict = None):
         engine = get_engine()
         try:
             with engine.begin() as connection:
                 result = function(connection, values)
                 if result[1] != 200:
-                    raise DBError("32!")
+                    raise DBError(f"{result[1]=}")
         except DBError:
             ...
         return result
+
     return wrapper
 
 

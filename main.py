@@ -1,31 +1,38 @@
-from typing import Tuple
+"""
+check ./doc/openapi.yaml
 
-from validator import validate_import, validate_uuid
-from models import create_product
+/imports            - POST
+/delete/<node_id>   - DELETE
+/nodes/<node_id>    - GET
+"""
+
+import json
+
+from flask import Flask, request
+
 from actions import import_goods_to_db, delete_goods_from_db
-import db_requests as req
-from responses import _validation_fail
-
-import flask
-from flask import Flask, jsonify, request, Response
-from json import loads
-
+from validator import validate_import, validate_uuid
+from responses import _validation_fail, _page_not_found
+from log import log_route
 
 app = Flask(__name__)
 
 
 def _get_data(req):
     try:
-        return loads(req.data.decode())
-    except ...:
+        return json.loads(req.data.decode())
+    except json.decoder.JSONDecodeError:
+        log_route.warning("Error. While unpacking data.")
         return {}
 
 
 @app.route("/imports", methods=["POST"])
 def import_goods():
+    """Gets data(offers, categories), validates and puts into database."""
     data = _get_data(request)
 
     if not validate_import(data):
+        log_route.warning("Validation failed.")
         return _validation_fail()
 
     return import_goods_to_db(data)
@@ -33,28 +40,32 @@ def import_goods():
 
 @app.route("/delete/<node_id>", methods=["DELETE"])
 def delete_goods(node_id):
+    """Delete offers or category with subcategories and children offers."""
     if not validate_uuid(node_id):
+        log_route.warning("Invalid uuid.")
         return _validation_fail()
 
     return delete_goods_from_db(node_id)
 
 
-@app.route("/nodes/<node_id>", methods=["GET"])
-def import_node(node_id):
-    if not validate_uuid(node_id):
-        return _validation_fail()
-
-    product = create_product({"id": node_id}, "")
-    result = db_request(check_item_in_db, product)
-
-    if not result:
-        return _item_not_found()
-
-    return 500
+# @app.route("/nodes/<node_id>", methods=["GET"])
+# def import_node(node_id):
+#     if not validate_uuid(node_id):
+#         return _validation_fail()
+#
+#     product = create_product({"id": node_id}, "")
+#     result = db_request(check_item_in_db, product)
+#
+#     if not result:
+#         return _item_not_found()
+#
+#     return 500
 
 
 @app.errorhandler(404)
 def error_page(error):
+    """If URL doesn't exit, user will get error-json."""
+    log_route.debug(f"Page not found; {error=}")
     return _page_not_found()
 
 

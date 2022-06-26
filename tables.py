@@ -1,7 +1,7 @@
-from connection import get_engine
-
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import declarative_base
+
+from connection import get_engine
 
 Base = declarative_base()
 

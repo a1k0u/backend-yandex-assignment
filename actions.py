@@ -1,7 +1,8 @@
-import connection
 from responses import _validation_fail, _send_result_process, _item_not_found
-import db_requests as req
 from models import create_product, Type
+from log import log_db
+import db_requests as req
+import connection
 
 
 @connection.connect_to_db
@@ -15,6 +16,7 @@ def import_goods_to_db(conn, items):
         if product.uuid is not None:
             element = req.check_item_in_db(conn, product)
             if not element or element[0][1] == Type.OFFER.name:
+                log_db.warning("No parent element or uuid parent is a offer.")
                 return _validation_fail()
         product.uuid = temporary
 
@@ -23,6 +25,7 @@ def import_goods_to_db(conn, items):
         else:
             group_status = result[0][1]
             if group_status != product.group:
+                log_db.warning("Invalid data: tries to change element type.")
                 return _validation_fail()
             req.update_item_in_db(conn, product)
     return _send_result_process()

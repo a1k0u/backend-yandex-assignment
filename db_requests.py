@@ -1,10 +1,7 @@
-from models import Product
-from exceptions import DBError
-from typing import Callable
-import os
-
-from tables import Goods
 from sqlalchemy import select, insert, delete, update
+
+from models import Product
+from tables import Goods
 
 
 def insert_item_into_db(conn, product: Product):
@@ -17,13 +14,13 @@ def insert_item_into_db(conn, product: Product):
         time_=product.date,
     )
     conn.execute(stmt)
-    return None
 
 
 def update_item_in_db(conn, product: Product):
-    stmt = update(Goods).\
-        where(Goods.id_ == product.uuid).\
-        values(
+    stmt = (
+        update(Goods)
+            .where(Goods.id_ == product.uuid)
+            .values(
             id_=product.uuid,
             name_=product.name,
             type_=product.group,
@@ -31,8 +28,8 @@ def update_item_in_db(conn, product: Product):
             price_=product.price,
             time_=product.date,
         )
+    )
     conn.execute(stmt)
-    return None
 
 
 def check_item_in_db(conn, product: Product):
@@ -43,7 +40,6 @@ def check_item_in_db(conn, product: Product):
 def delete_item_from_db(conn, uuid):
     stmt = delete(Goods).where(Goods.id_ == uuid)
     conn.execute(stmt)
-    return None
 
 
 def take_element_by_uuid(conn, uuid):
