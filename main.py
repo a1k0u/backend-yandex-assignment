@@ -10,10 +10,10 @@ import json
 
 from flask import Flask, request
 
-from actions import import_goods_to_db, delete_goods_from_db
-from validator import validate_import, validate_uuid
-from responses import _validation_fail, _page_not_found
-from log import log_route
+from db.actions import import_goods_to_db, delete_goods_from_db
+from utils.validator import validate_import, validate_uuid
+from objects.responses import _validation_fail, _page_not_found
+from utils.log import log_route
 
 app = Flask(__name__)
 

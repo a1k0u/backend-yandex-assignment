@@ -1,11 +1,15 @@
-from responses import _validation_fail, _send_result_process, _item_not_found
-from models import create_product, Type
-from log import log_db
-import db_requests as req
-import connection
+import sys
+import os
 
 
-@connection.connect_to_db
+from objects.responses import _validation_fail, _send_result_process, _item_not_found
+from objects.models import create_product, Type
+from db.connection import connect_to_db
+from utils.log import log_db
+import db.db_requests as req
+
+
+@connect_to_db
 def import_goods_to_db(conn, items):
     for item in items.get("items", []):
         product = create_product(item, items["updateDate"])
@@ -31,7 +35,7 @@ def import_goods_to_db(conn, items):
     return _send_result_process()
 
 
-@connection.connect_to_db
+@connect_to_db
 def delete_goods_from_db(conn, node_id):
     element = req.take_element_by_uuid(conn, node_id)
     if not element:

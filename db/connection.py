@@ -11,8 +11,8 @@ from typing import Callable
 from sqlalchemy import create_engine
 import sqlalchemy.engine
 
-from variables import get_env_vars
-from exceptions import DBError
+from utils.variables import get_env_vars
+from objects.exceptions import DBError
 
 
 @lru_cache
