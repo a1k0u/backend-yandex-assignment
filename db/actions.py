@@ -82,19 +82,25 @@ def delete_goods_from_db(conn, node_id):
 def export_nodes_from_db(conn, node_id):
     element = req.get_element_by_uuid(conn, node_id)
     if not element:
-        return item_not_found()
+        return *item_not_found(), 0, 0
 
     unit = create_response_unit(element)
+    summa, counter = 0, 0
     if unit["type"] == Type.CATEGORY.name:
         children = req.find_by_parent_id(conn, unit["id"])
         unit["children"] = [] if children else None
 
         for child in children:
-            unit["children"].append(export_nodes_from_db(child.id)[0])
-            print(unit["children"])
-            unit["price"] = unit["children"][-1]["price"] + (
-                0 if unit.get("price") is None else unit["price"]
-            )
+            unit_child, code, _summa, _counter = export_nodes_from_db(child.id)
+            unit["children"].append(unit_child)
 
-        unit["price"] = None if not children else (unit["price"] // len(children))
-    return unit, 200
+            previous_child = unit["children"][-1]
+            if previous_child["type"] == Type.OFFER.name:
+                counter += 1
+                summa += previous_child["price"]
+            if previous_child["type"] == Type.CATEGORY.name:
+                summa += _summa
+                counter += _counter
+
+        unit["price"] = None if not children else (summa // counter)
+    return unit, 200, summa, counter

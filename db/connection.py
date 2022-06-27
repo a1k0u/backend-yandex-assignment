@@ -8,6 +8,7 @@ commits changes or rollback if programme got exceptions.
 from functools import lru_cache
 from typing import Callable
 
+
 from sqlalchemy import create_engine
 import sqlalchemy.engine
 

@@ -9,6 +9,7 @@ check ./doc/openapi.yaml
 import json
 
 from flask import Flask, request, jsonify
+import flask.wrappers
 
 from db.actions import import_goods_to_db, delete_goods_from_db, export_nodes_from_db
 from utils.validator import validate_import, validate_uuid
@@ -53,8 +54,11 @@ def import_node(node_id):
     if not validate_uuid(node_id):
         return validation_fail()
 
-    response, code = export_nodes_from_db(node_id)
-    return jsonify(response), code
+    response, code, *extra = export_nodes_from_db(node_id)
+    if not isinstance(response, flask.wrappers.Response):
+        response = jsonify(response)
+
+    return response, code
 
 
 @app.errorhandler(404)
