@@ -19,9 +19,9 @@ def get_env_vars() -> dict:
 
 @dataclass
 class Product:
-    uuid: str
+    id: str
     name: str
-    group: str
+    type: str
     parent_id: str
     price: int
     date: str
@@ -34,9 +34,9 @@ class Type(Enum):
 
 def create_product(item: dict, time: str) -> Product:
     return Product(
-        uuid=item.get("id"),
+        id=item.get("id"),
         name=item.get("name"),
-        group=item.get("type"),
+        type=item.get("type"),
         parent_id=item.get("parentId"),
         price=item.get("price"),
         date=time,

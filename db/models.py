@@ -9,12 +9,12 @@ Base = declarative_base()
 class Goods(Base):
     __tablename__ = "Goods"
 
-    id_ = Column(String(36), primary_key=True, nullable=False)
-    name_ = Column(String, nullable=False)
-    type_ = Column(String(32))
-    parent_id_ = Column(String(36))
-    price_ = Column(Integer)
-    time_ = Column(String(24), nullable=False)
+    id = Column(String(36), primary_key=True, nullable=False)
+    name = Column(String, nullable=False)
+    type = Column(String(32))
+    parent_id = Column(String(36))
+    price = Column(Integer)
+    date = Column(String(24), nullable=False)
 
 
 if __name__ == "__main__":
