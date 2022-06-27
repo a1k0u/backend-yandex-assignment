@@ -10,16 +10,17 @@ from utils.logger import log_db
 import db.requests as req
 
 
-def __process_node_id(conn, node_id, to_check: set):
-    element = req.take_element_by_uuid(conn, node_id)
-    if not element:
-        return item_not_found()
-
-    element_status, element_uuid = element[0][2], element[0][0]
-    if element_status == Type.CATEGORY.name:
-        to_check.add(element_uuid)
-
-    return None
+def __create_response_unit(element) -> dict:
+    _id, _name, _type, _parent_id, _price, _time = element[0]
+    return dict(
+        id=_id,
+        name=_name,
+        type=_type,
+        parentId=_parent_id,
+        date=_time,
+        price=_price,
+        children=None,
+    )
 
 
 @connect_to_db
@@ -50,35 +51,20 @@ def import_goods_to_db(conn, items):
 
 @connect_to_db
 def delete_goods_from_db(conn, node_id):
-    uuids_to_check, uuids_to_delete = set(), {node_id}
+    element = req.take_element_by_uuid(conn, node_id)
+    if not element:
+        return item_not_found()
 
-    answer = __process_node_id(conn, node_id, uuids_to_check)
-    if answer is not None:
-        return answer
-
-    while uuids_to_check:
-        items = req.find_by_parent_id(conn, uuids_to_check.pop())
-        for uuid, group in items:
-            uuids_to_delete.add(uuid)
-            if group == Type.CATEGORY.name:
-                uuids_to_check.add(uuid)
-
-    for uuid in uuids_to_delete:
-        req.delete_item_from_db(conn, uuid)
-    return send_success()
-
-
-def __create_response_unit(element) -> dict:
-    _id, _name, _type, _parent_id, _price, _time = element[0]
-    return dict(
-        id=_id,
-        name=_name,
-        type=_type,
-        parentId=_parent_id,
-        date=_time,
-        price=_price,
-        children=None,
+    children = (
+        req.find_by_parent_id(conn, element[0][0])
+        if element[0][2] == Type.CATEGORY.name
+        else []
     )
+    for child in children:
+        delete_goods_from_db(child[0])
+
+    req.delete_item_from_db(conn, node_id)
+    return send_success()
 
 
 @connect_to_db
