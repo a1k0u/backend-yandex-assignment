@@ -4,7 +4,7 @@ from objects.variables import Product
 from db.models import Goods
 
 
-def insert_item_into_db(conn, product: Product):
+def insert_item_into_db(conn, product: Product) -> None:
     stmt = insert(Goods).values(
         id_=product.uuid,
         name_=product.name,
@@ -16,11 +16,11 @@ def insert_item_into_db(conn, product: Product):
     conn.execute(stmt)
 
 
-def update_item_in_db(conn, product: Product):
+def update_item_in_db(conn, product: Product) -> None:
     stmt = (
         update(Goods)
-            .where(Goods.id_ == product.uuid)
-            .values(
+        .where(Goods.id_ == product.uuid)
+        .values(
             id_=product.uuid,
             name_=product.name,
             type_=product.group,
@@ -32,21 +32,21 @@ def update_item_in_db(conn, product: Product):
     conn.execute(stmt)
 
 
-def check_item_in_db(conn, product: Product):
+def check_item_in_db(conn, product: Product) -> list:
     stmt = select(Goods.id_, Goods.type_).where(Goods.id_ == product.uuid)
     return conn.execute(stmt).fetchall()
 
 
-def delete_item_from_db(conn, uuid):
+def delete_item_from_db(conn, uuid: str) -> None:
     stmt = delete(Goods).where(Goods.id_ == uuid)
     conn.execute(stmt)
 
 
-def take_element_by_uuid(conn, uuid):
+def take_element_by_uuid(conn, uuid: str) -> list:
     stmt = select(Goods).where(Goods.id_ == uuid)
     return conn.execute(stmt).fetchall()
 
 
-def find_by_parent_id(conn, uuid):
+def find_by_parent_id(conn, uuid: str) -> list:
     stmt = select(Goods.id_, Goods.type_).where(Goods.parent_id_ == uuid)
     return conn.execute(stmt).fetchall()

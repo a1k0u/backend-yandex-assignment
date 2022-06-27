@@ -1,6 +1,6 @@
-from flask import jsonify, Response
-
 from typing import Tuple
+
+from flask import jsonify, Response
 
 
 def validation_fail() -> Tuple[Response, int]:
@@ -15,5 +15,5 @@ def page_not_found() -> Tuple[Response, int]:
     return jsonify(dict(code=404, message="Page not found")), 404
 
 
-def send_result_process(code=200) -> Tuple[Response, int]:
-    return jsonify(dict(code=code)), 200
+def send_success() -> Tuple[Response, int]:
+    return jsonify(dict(code=200)), 200

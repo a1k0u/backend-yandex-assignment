@@ -8,9 +8,9 @@ check ./doc/openapi.yaml
 
 import json
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 
-from db.actions import import_goods_to_db, delete_goods_from_db
+from db.actions import import_goods_to_db, delete_goods_from_db, export_nodes_from_db
 from utils.validator import validate_import, validate_uuid
 from objects.responses import validation_fail, page_not_found
 from utils.logger import log_route
@@ -53,13 +53,8 @@ def import_node(node_id):
     if not validate_uuid(node_id):
         return validation_fail()
 
-    product = create_product({"id": node_id}, "")
-    result = db_request(check_item_in_db, product)
-
-    if not result:
-        return _item_not_found()
-
-    return 500
+    response, code = export_nodes_from_db(node_id)
+    return jsonify(response), code
 
 
 @app.errorhandler(404)
@@ -70,4 +65,4 @@ def error_page(error):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="127.0.0.1", port=5000, debug=True)
