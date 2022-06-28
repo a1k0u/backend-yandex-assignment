@@ -12,7 +12,8 @@ from flask import Flask, request, jsonify
 import flask.wrappers
 
 from db.actions import import_goods_to_db, delete_goods_from_db, export_nodes_from_db
-from utils.validator import validate_import, validate_uuid
+from db.connection import serialize_data
+from utils.validator import validate_import, validate_uuid, validate_time
 from objects.responses import validation_fail, page_not_found
 from utils.logger import log_route
 
@@ -31,10 +32,9 @@ def _get_data(req):
 def import_goods():
     """Gets data(offers, categories), validates and puts into database."""
     data = _get_data(request)
-
     if not validate_import(data):
         log_route.warning("Validation failed.")
-        return validation_fail()
+        return serialize_data(validation_fail())
 
     return import_goods_to_db(data)
 
@@ -44,7 +44,7 @@ def delete_goods(node_id):
     """Delete offers or category with subcategories and children offers."""
     if not validate_uuid(node_id):
         log_route.warning("Invalid uuid.")
-        return validation_fail()
+        return serialize_data(validation_fail())
 
     return delete_goods_from_db(node_id)
 
@@ -52,14 +52,20 @@ def delete_goods(node_id):
 @app.route("/nodes/<node_id>", methods=["GET"])
 def import_node(node_id):
     if not validate_uuid(node_id):
-        return validation_fail()
+        return serialize_data(validation_fail())
 
     response, code, *extra = export_nodes_from_db(node_id)
-    if not isinstance(response, flask.wrappers.Response):
-        response = jsonify(response)
 
     return response, code
 
+
+@app.route("/sales", methods=["GET"])
+def get_sales():
+    date = request.args.get("date", "")
+    if not validate_time(date):
+        return validation_fail()
+
+    
 
 @app.errorhandler(404)
 def error_page(error):

@@ -4,6 +4,7 @@ Check ../doc/openapi.yaml.
 """
 
 from datetime import datetime
+from typing import Any
 from uuid import UUID
 
 from utils.logger import log_validator
@@ -34,7 +35,7 @@ def validate_time(time: str) -> bool:
     return True
 
 
-def validate_price(num) -> int:
+def validate_price(num: Any) -> int:
     """
     Validates price. Price has to be integer.
     If price is str, None or etc. will return -1.
@@ -45,50 +46,69 @@ def validate_price(num) -> int:
     except (ValueError, TypeError):
         return -1
 
-# TODO: logger
-def validate_item(item) -> bool:
-    """Validates by name, type and price specific."""
+
+def validate_item(item: dict) -> bool:
+    """
+    Validates by name, type and price specific.
+    """
 
     if item.get("name") is None:
-        log_validator.debug(f"Name field is empty, {item.get('id')=}.")
+        log_validator.warning(f"The Name field is empty, {item.get('id')=}.")
         return False
 
     if item.get("type") is None:
-        log_validator.debug("Type field is empty.")
+        log_validator.warning(f"The Type field is empty, {item.get('id')=}.")
         return False
 
-    if item.get("type") not in (Type.OFFER.name, Type.CATEGORY.name):
-        log_validator.debug("Type isn't in the list.")
+    if item.get("type") not in [el.value for el in Type]:
+        log_validator.warning(
+            f"This type isn't exist `{item.get('type')=}`, {item.get('id')=}"
+        )
         return False
 
-    if item.get("type") == Type.OFFER.name and validate_price(item.get("price")) < 0:
-        log_validator.debug("Offer has negative price or null.")
+    if item.get("type") == Type.OFFER.value and validate_price(item.get("price")) < 0:
+        log_validator.warning(
+            f"Offer has negative price, null or incorrect format, {item.get('id')=}"
+        )
         return False
 
-    if item.get("type") == Type.CATEGORY.name and item.get("price") is not None:
-        log_validator.debug("Category doesn't null, have price.")
+    if item.get("type") == Type.CATEGORY.value and item.get("price") is not None:
+        log_validator.warning(
+            f"The category is not zero, it has a price, {item.get('id')=}."
+        )
         return False
 
     return True
 
 
 def validate_import(data: dict) -> bool:
-    """Validates import data."""
+    """
+    Validates import data (time, items).
+    """
+
     time = data.get("updateDate", "")
     if not validate_time(time):
-        log_validator.debug(f"Incorrect time, got: {time}")
+        log_validator.warning(f"Incorrect time, got: {time}.")
         return False
 
     uuids = {None}
     for item in data.get("items", []):
+
         item_id = item.get("id", None)
         if item_id in uuids or not validate_uuid(item_id):
-            log_validator.debug("Got two or equal uuids in one request.")
+            log_validator.warning(
+                f"Got two equal uuids in one request or uuid is invalid, {item_id=}."
+            )
             return False
-        uuids.add(item["id"])
+        uuids.add(item_id)
 
         if not validate_item(item):
+            log_validator.warning(f"Data validation was unsuccessful, {item_id=}")
             return False
+
+        log_validator.debug(f"Item={item_id} validation was successful.")
+
+    log_validator.debug(f"Data validation was successful, {time=}")
     return True
 
 

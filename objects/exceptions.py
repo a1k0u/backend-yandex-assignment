@@ -1,4 +1,6 @@
-"""Exceptions for REST API application."""
+"""
+Exceptions for REST API application.
+"""
 
 
 class DatabaseError(Exception):

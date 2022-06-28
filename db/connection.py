@@ -14,6 +14,7 @@ import sqlalchemy.engine
 
 from objects.variables import get_env_vars
 from objects.exceptions import DatabaseError
+from utils.logger import log_db, log_route
 
 
 @lru_cache
@@ -26,6 +27,8 @@ def get_engine() -> sqlalchemy.engine.Engine:
     """
 
     var = get_env_vars()
+    log_db.debug("Got environmental variables for database.")
+
     engine = create_engine(
         f"postgresql+psycopg2://"
         f"{var['PGUSER']}:"
@@ -34,6 +37,7 @@ def get_engine() -> sqlalchemy.engine.Engine:
         f"{var['PGPORT']}/"
         f"{var['PGDB']}"
     )
+    log_db.debug("Engine for db was created.")
 
     return engine
 
@@ -56,13 +60,21 @@ def connect_to_db(function: Callable) -> Callable:
         engine = get_engine()
         try:
             with engine.begin() as connection:
-                result = function(connection, values)
-                if result[1] != 200:
-                    raise DatabaseError(f"Expected HTTP status code 200, got {result[1]=}.")
-        except DatabaseError:
-            ...
+                log_db.debug("Got connection to db.")
 
-        return __serialize_data(result)
+                result = function(connection, values)
+
+                log_db.debug("Got results from database.")
+
+                if result[1] != 200:
+                    raise DatabaseError("DB error.")
+        except DatabaseError:
+            log_db.warning(f"Expected HTTP status code 200, got {result[1]=}.")
+
+        response = __serialize_data(result)
+        log_route.debug("Data was serialized.")
+
+        return response
 
     return wrapper
 

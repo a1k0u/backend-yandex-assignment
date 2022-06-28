@@ -8,6 +8,7 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import declarative_base
 
 from db.connection import get_engine
+from utils.logger import log_db
 
 Base = declarative_base()
 
@@ -29,4 +30,5 @@ class Goods(Base):
 
 
 if __name__ == "__main__":
+    log_db.debug("Tables was created.")
     Base.metadata.create_all(get_engine())
