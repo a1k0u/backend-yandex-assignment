@@ -1,6 +1,6 @@
 """
 The main center of validating data.
-Check ./doc/openapi.yaml.
+Check ../doc/openapi.yaml.
 """
 
 from datetime import datetime
@@ -11,16 +11,22 @@ from objects.variables import Type
 
 
 def validate_uuid(uuid: str) -> bool:
-    """Validates uuid"""
+    """
+    Validates uuid (element's id) by uuid module.
+    """
+
     try:
-        version = UUID(uuid).version
+        UUID(uuid)
     except ValueError:
         return False
     return True
 
 
 def validate_time(time: str) -> bool:
-    """Validates time in ISO 8601"""
+    """
+    Validates time in ISO 8601 format.
+    """
+
     try:
         datetime.strptime(time, "%Y-%m-%dT%H:%M:%S.%fZ")
     except ValueError:
@@ -28,22 +34,27 @@ def validate_time(time: str) -> bool:
     return True
 
 
-def validate_price(num) -> float:
-    """Validates price. If str, None and etc. -> returns -1."""
+def validate_price(num) -> int:
+    """
+    Validates price. Price has to be integer.
+    If price is str, None or etc. will return -1.
+    """
+
     try:
-        return float(num)
+        return int(num)
     except (ValueError, TypeError):
         return -1
 
-
+# TODO: logger
 def validate_item(item) -> bool:
     """Validates by name, type and price specific."""
+
     if item.get("name") is None:
-        log_validator.debug("Incorrect name.")
+        log_validator.debug(f"Name field is empty, {item.get('id')=}.")
         return False
 
     if item.get("type") is None:
-        log_validator.debug("Incorrect type.")
+        log_validator.debug("Type field is empty.")
         return False
 
     if item.get("type") not in (Type.OFFER.name, Type.CATEGORY.name):
@@ -79,3 +90,7 @@ def validate_import(data: dict) -> bool:
         if not validate_item(item):
             return False
     return True
+
+
+if __name__ == "__main__":
+    print(validate_uuid("3fa85f64-5717-4562-b3fc-2c963f66a444"))

@@ -1,12 +1,16 @@
+"""
+This script file contains all database queries.
+"""
+
 from typing import List
 
 from sqlalchemy import select, insert, delete, update
 
-from objects.variables import Product, create_product
+from objects.variables import Product
 from db.models import Goods
 
 
-def insert_item_into_db(conn, product: Product) -> None:
+def insert_element(conn, product: Product) -> None:
     stmt = insert(Goods).values(
         id=product.id,
         name=product.name,
@@ -18,7 +22,7 @@ def insert_item_into_db(conn, product: Product) -> None:
     conn.execute(stmt)
 
 
-def update_item_in_db(conn, product: Product) -> None:
+def update_element_by_id(conn, product: Product) -> None:
     stmt = (
         update(Goods)
         .where(Goods.id == product.id)
@@ -34,37 +38,22 @@ def update_item_in_db(conn, product: Product) -> None:
     conn.execute(stmt)
 
 
-def update_item_time_in_db(conn, node_id, time) -> None:
+def update_element_time_by_id(conn, node_id, time) -> None:
     stmt = update(Goods).where(Goods.id == node_id).values(date=time)
     conn.execute(stmt)
 
 
-def delete_item_from_db(conn, uuid: str) -> None:
+def delete_element_by_id(conn, uuid: str) -> None:
     stmt = delete(Goods).where(Goods.id == uuid)
     conn.execute(stmt)
 
 
-def get_element_by_uuid(conn, uuid: str) -> Product:
+def get_element_by_id(conn, uuid: str) -> Product:
     stmt = select(Goods).where(Goods.id == uuid)
     result = conn.execute(stmt).fetchone()
-    if not result:
-        return result
-
-    return create_product(
-        dict(
-            id=result[0],
-            name=result[1],
-            type=result[2],
-            parentId=result[3],
-            price=result[4],
-        ),
-        result[5],
-    )
+    return result if not result else Product(*result)
 
 
-def find_by_parent_id(conn, uuid: str) -> List[Product]:
-    stmt = select(Goods.id, Goods.type).where(Goods.parent_id == uuid)
-    return [
-        create_product(dict(id=el[0], type=el[1]), "")
-        for el in conn.execute(stmt).fetchall()
-    ]
+def get_elements_by_parent_id(conn, uuid: str) -> List[Product]:
+    stmt = select(Goods).where(Goods.parent_id == uuid)
+    return [Product(*el) for el in conn.execute(stmt).fetchall()]
