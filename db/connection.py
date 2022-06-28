@@ -42,7 +42,7 @@ def get_engine() -> sqlalchemy.engine.Engine:
     return engine
 
 
-def __serialize_data(response: tuple):
+def serialize_data(response: tuple):
     return jsonify(response[0]), *response[1:]
 
 
@@ -71,7 +71,7 @@ def connect_to_db(function: Callable) -> Callable:
         except DatabaseError:
             log_db.warning(f"Expected HTTP status code 200, got {result[1]=}.")
 
-        response = __serialize_data(result)
+        response = serialize_data(result)
         log_route.debug("Data was serialized.")
 
         return response

@@ -57,6 +57,3 @@ def create_product_from_dict(item: dict, time: str) -> Product:
 
 if __name__ == "__main__":
     print(Product(*["a", "b", "c", "d", 101, "f"]))
-    print([el.value for el in Type])
-    print(Type.OFFER.name)
-    print(Type.OFFER.value)
