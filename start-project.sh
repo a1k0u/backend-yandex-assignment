@@ -3,6 +3,9 @@
 LOG="\033[41m\033[30m[LOG]:\033[0m"
 LINE="\033[42m\033[30m---------------------------------------------------------------\033[0m"
 
+echo "$LOG export env variables for database."
+while IFS= read -r line; do export "$line"; done < .env
+
 echo -e "$LOG set virtual environment for python."
 make create
 
