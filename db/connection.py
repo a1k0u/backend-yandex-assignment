@@ -69,7 +69,7 @@ def connect_to_db(function: Callable) -> Callable:
                 if result[1] != 200:
                     raise DatabaseError("DB error.")
         except DatabaseError:
-            log_db.warning(f"Expected HTTP status code 200, got {result[1]=}.")
+            log_db.warning(f"Rollback database, because got {result[1]=} status code.")
 
         response = serialize_data(result)
         log_route.debug("Data was serialized.")

@@ -8,7 +8,7 @@ from typing import Any
 from uuid import UUID
 
 from utils.logger import log_validator
-from objects.variables import Type
+from objects.variables import Type, create_time_from_str
 
 
 def validate_uuid(uuid: str) -> bool:
@@ -29,7 +29,7 @@ def validate_time(time: str) -> bool:
     """
 
     try:
-        datetime.strptime(time, "%Y-%m-%dT%H:%M:%S.%fZ")
+        create_time_from_str(time)
     except ValueError:
         return False
     return True

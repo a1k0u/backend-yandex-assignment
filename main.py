@@ -32,17 +32,20 @@ def _get_data(req):
 @app.route("/imports", methods=["POST"])
 def import_goods():
     data = _get_data(request)
-    return import_goods_to_db(data)
+    _response, _code = import_goods_to_db(data)
+    return _response, _code
 
 
 @app.route("/delete/<node_id>", methods=["DELETE"])
 def delete_goods(node_id):
-    return delete_goods_from_db(node_id)
+    _response, _code = delete_goods_from_db(node_id)
+    return _response, _code
 
 
 @app.route("/nodes/<node_id>", methods=["GET"])
 def export_goods(node_id):
-    return export_goods_from_db(node_id)
+    _response, _code = export_goods_from_db(node_id)
+    return _response, _code
 
 
 @app.errorhandler(404)

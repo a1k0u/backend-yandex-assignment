@@ -4,7 +4,7 @@ If you start this script, all tables will create in DB,
 which gets by get_engine in connection.py.
 """
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import declarative_base
 
 from db.connection import get_engine
@@ -26,7 +26,7 @@ class Goods(Base):
     type = Column(String(32))
     parent_id = Column(String(36))
     price = Column(Integer)
-    date = Column(String(24), nullable=False)  # TODO: transform info date (ISO).
+    date = Column(DateTime, nullable=False)
 
 
 if __name__ == "__main__":

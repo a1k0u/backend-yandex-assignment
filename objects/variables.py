@@ -6,6 +6,7 @@ for column `type` in DB by enum format.
 """
 
 from dataclasses import dataclass
+from datetime import datetime
 from enum import Enum
 import os
 
@@ -29,6 +30,16 @@ def get_env_vars() -> dict:
     )
 
 
+def create_time_from_str(time: str) -> datetime:
+    return datetime.strptime(time, "%Y-%m-%dT%H:%M:%S.%fZ")
+
+
+def create_str_from_time(time: datetime) -> str:
+    ms = str(time.microsecond)
+    ms = "0" * (3 - len(ms) % 3 if len(ms) < 3 else 0) + ms
+    return "{:%Y-%m-%dT%H:%M:%S}.{}Z".format(time, ms)
+
+
 @dataclass
 class Product:
     id: str
@@ -36,7 +47,7 @@ class Product:
     type: str
     parent_id: str
     price: int
-    date: str
+    date: datetime
 
 
 class Type(Enum):
@@ -51,9 +62,5 @@ def create_product_from_dict(item: dict, time: str) -> Product:
         type=item.get("type"),
         parent_id=item.get("parentId"),
         price=item.get("price"),
-        date=time,
+        date=create_time_from_str(time),
     )
-
-
-if __name__ == "__main__":
-    print(Product(*["a", "b", "c", "d", 101, "f"]))

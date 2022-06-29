@@ -1,13 +1,14 @@
+import datetime
 from typing import List
 import sys
 import os
 
-from objects.variables import create_product_from_dict, Type, Product
+from objects.variables import create_product_from_dict, Type, Product, create_str_from_time
 from db.connection import connect_to_db
 from utils.validator import validate_uuid, validate_import
 from utils.logger import log_db
 import objects.responses as response
-import db.requests as req
+import db.requests as request
 
 
 def __create_response_unit(element: Product) -> dict:
@@ -16,7 +17,7 @@ def __create_response_unit(element: Product) -> dict:
         name=element.name,
         type=element.type,
         parentId=element.parent_id,
-        date=element.date,
+        date=create_str_from_time(element.date),
         price=element.price,
         children=None,
     )
@@ -28,9 +29,9 @@ def __update_elements_date(conn, elements: set, date) -> None:
         element = elements.pop()
         if element not in checked:
 
-            req.update_element_time_by_id(conn, element, date)
+            request.update_element_time_by_id(conn, element, date)
             log_db.debug(f"the time of {element} was updated.")
-            element_value = req.get_element_by_id(conn, element)
+            element_value = request.get_element_by_id(conn, element)
 
             if element_value and element_value.parent_id not in checked:
                 elements.add(element_value.parent_id)
@@ -42,17 +43,17 @@ def __update_elements_date(conn, elements: set, date) -> None:
 def import_goods_to_db(conn, items):
 
     if not validate_import(items):
-        return validation_fail_response()
+        return response.validation_fail_response()
 
     elements_to_update_time = set()
     for item in items.get("items", []):
 
         product: Product = create_product_from_dict(item, items["updateDate"])
-        result = req.get_element_by_id(conn, product.id)
+        result = request.get_element_by_id(conn, product.id)
         elements_to_update_time.add(product.parent_id)
 
         if product.parent_id is not None:
-            parent_element = req.get_element_by_id(conn, product.parent_id)
+            parent_element = request.get_element_by_id(conn, product.parent_id)
             if not parent_element or parent_element.type == Type.OFFER.value:
                 log_db.warning(
                     f"No parent element in DB or parent of {product.id} is a offer."
@@ -60,7 +61,7 @@ def import_goods_to_db(conn, items):
                 return response.validation_fail_response()
 
         if not result:
-            req.insert_element(conn, product)
+            request.insert_element(conn, product)
             log_db.debug(f"{product.id=} was inserted in database.")
             continue
 
@@ -70,7 +71,7 @@ def import_goods_to_db(conn, items):
             )
             return response.validation_fail_response()
 
-        req.update_element_by_id(conn, product)
+        request.update_element_by_id(conn, product)
         log_db.debug(f"{product.id=} was updated in database.")
 
     __update_elements_date(conn, elements_to_update_time, items["updateDate"])
@@ -80,10 +81,10 @@ def import_goods_to_db(conn, items):
 
 
 def __delete_related_goods(conn, node_id):
-    element = req.get_element_by_id(conn, node_id)
+    element = request.get_element_by_id(conn, node_id)
 
     children = (
-        req.get_elements_by_parent_id(conn, node_id)
+        request.get_elements_by_parent_id(conn, node_id)
         if element.type == Type.CATEGORY.value
         else []
     )
@@ -91,7 +92,7 @@ def __delete_related_goods(conn, node_id):
     for child in children:
         __delete_related_goods(conn, child.id)
 
-    req.delete_element_by_id(conn, node_id)
+    request.delete_element_by_id(conn, node_id)
     log_db.debug(f"{node_id=} was deleted.")
 
 
@@ -101,7 +102,7 @@ def delete_goods_from_db(conn, node_id):
         log_route.warning(f"Invalid uuid={node_id}.")
         return response.validation_fail_response()
 
-    element = req.get_element_by_id(conn, node_id)
+    element = request.get_element_by_id(conn, node_id)
     if not element:
         log_db.warning(f"Element doesn't exist, {node_id=}.")
         return response.element_not_found_response()
@@ -113,12 +114,12 @@ def delete_goods_from_db(conn, node_id):
 
 
 def __export_related_goods(conn, node_id, summa, counter):
-    element = req.get_element_by_id(conn, node_id)
+    element = request.get_element_by_id(conn, node_id)
     unit = __create_response_unit(element)
     log_db.debug(f"Unit of response for {node_id=} was created.")
 
     if unit["type"] == Type.CATEGORY.value:
-        children = req.get_elements_by_parent_id(conn, unit["id"])
+        children = request.get_elements_by_parent_id(conn, unit["id"])
         unit["children"] = [] if children else None
 
         for child in children:
@@ -147,7 +148,7 @@ def export_goods_from_db(conn, node_id):
         log_route.warning(f"Invalid uuid={node_id}.")
         return response.validation_fail_response()
 
-    element = req.get_element_by_id(conn, node_id)
+    element = request.get_element_by_id(conn, node_id)
     if not element:
         log_db.warning(f"Element doesn't exist, {node_id=}.")
         return response.element_not_found_response()
