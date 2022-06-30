@@ -35,9 +35,7 @@ def create_time_from_str(time: str) -> datetime:
 
 
 def create_str_from_time(time: datetime) -> str:
-    ms = str(time.microsecond)
-    ms = "0" * (3 - len(ms) % 3 if len(ms) < 3 else 0) + ms
-    return "{:%Y-%m-%dT%H:%M:%S}.{}Z".format(time, ms)
+    return time.isoformat("T", "milliseconds") + "Z"
 
 
 @dataclass

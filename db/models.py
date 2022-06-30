@@ -26,7 +26,7 @@ class Goods(Base):
     type = Column(String(32))
     parent_id = Column(String(36))
     price = Column(Integer)
-    date = Column(DateTime, nullable=False)
+    date = Column(DateTime(timezone=False), nullable=False)
 
 
 if __name__ == "__main__":
