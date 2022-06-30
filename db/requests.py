@@ -1,12 +1,12 @@
 """
 This script file contains all database queries.
 """
-
+import datetime
 from typing import List
 
-from sqlalchemy import select, insert, delete, update
+from sqlalchemy import select, insert, delete, update, and_
 
-from objects.variables import Product
+from objects.variables import Product, Type
 from db.models import Goods
 
 
@@ -57,3 +57,12 @@ def get_element_by_id(conn, uuid: str) -> Product:
 def get_elements_by_parent_id(conn, uuid: str) -> List[Product]:
     stmt = select(Goods).where(Goods.parent_id == uuid)
     return [Product(*el) for el in conn.execute(stmt).fetchall()]
+
+
+def get_offers_by_time(coon, date: datetime) -> List[Product]:
+    date_start = date - datetime.timedelta(hours=24)
+    date_end = date
+    stmt = select(Goods).\
+        where(Goods.type == Type.OFFER.value).\
+        where(and_(date_start <= Goods.date, Goods.date <= date_end))
+    return [Product(*el) for el in coon.execute(stmt).fetchall()]

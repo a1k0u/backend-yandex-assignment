@@ -11,7 +11,7 @@ import json
 from flask import Flask, request, jsonify
 import flask.wrappers
 
-from db.actions import import_goods_to_db, delete_goods_from_db, export_goods_from_db
+from db.actions import import_goods_to_db, delete_goods_from_db, export_goods_from_db, export_sales_from_db
 from db.connection import serialize_data
 from utils.validator import validate_import, validate_uuid, validate_time
 from utils.logger import log_route
@@ -45,6 +45,13 @@ def delete_goods(node_id):
 @app.route("/nodes/<node_id>", methods=["GET"])
 def export_goods(node_id):
     _response, _code = export_goods_from_db(node_id)
+    return _response, _code
+
+
+@app.route("/sales", methods=["GET"])
+def export_sales():
+    date = request.args.get("date", "")
+    _response, _code = export_sales_from_db(date)
     return _response, _code
 
 
