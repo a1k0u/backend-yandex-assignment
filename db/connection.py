@@ -1,7 +1,7 @@
 """
 Creates engine to database by sqlalchemy and saves it by lru_cache,
 and here's you can find a decorator for functions,
-which work with database. This decorator creates connection
+which work with a database. This decorator creates connection
 and after success executes commits changes or rollback if programme got exceptions.
 """
 

@@ -1,6 +1,6 @@
 """
 Contains various answers for routes.
-Returns a status code and  a dictionary with a code, message.
+Returns a status code and a dictionary with code, message.
 """
 
 from typing import Tuple

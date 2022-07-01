@@ -11,7 +11,12 @@ import json
 from flask import Flask, request, jsonify
 import flask.wrappers
 
-from db.actions import import_goods_to_db, delete_goods_from_db, export_goods_from_db, export_sales_from_db
+from db.actions import (
+    import_goods_to_db,
+    delete_goods_from_db,
+    export_goods_from_db,
+    export_sales_from_db,
+)
 from db.connection import serialize_data
 from utils.validator import validate_import, validate_uuid, validate_time
 from utils.logger import log_route
@@ -21,7 +26,12 @@ import objects.responses as response
 app = Flask(__name__)
 
 
-def _get_data(req):
+def _get_data(req) -> dict:
+    """
+    Gets data from flask request,
+    decodes it and load in a dict.
+    """
+
     try:
         return json.loads(req.data.decode())
     except json.decoder.JSONDecodeError:

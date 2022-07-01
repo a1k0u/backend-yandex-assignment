@@ -1,6 +1,7 @@
 """
 This script file contains all database queries.
 """
+
 import datetime
 from typing import List
 
@@ -38,8 +39,8 @@ def update_element_by_id(conn, product: Product) -> None:
     conn.execute(stmt)
 
 
-def update_element_time_by_id(conn, node_id, time) -> None:
-    stmt = update(Goods).where(Goods.id == node_id).values(date=time)
+def update_element_time_by_id(conn, node_id: str, date: datetime) -> None:
+    stmt = update(Goods).where(Goods.id == node_id).values(date=date)
     conn.execute(stmt)
 
 
@@ -59,10 +60,12 @@ def get_elements_by_parent_id(conn, uuid: str) -> List[Product]:
     return [Product(*el) for el in conn.execute(stmt).fetchall()]
 
 
-def get_offers_by_time(coon, date: datetime) -> List[Product]:
-    date_start = date - datetime.timedelta(hours=24)
-    date_end = date
-    stmt = select(Goods).\
-        where(Goods.type == Type.OFFER.value).\
-        where(and_(date_start <= Goods.date, Goods.date <= date_end))
+def get_offers_by_time_period(
+    coon, date_start: datetime, date_end: datetime
+) -> List[Product]:
+    stmt = (
+        select(Goods)
+        .where(Goods.type == Type.OFFER.value)
+        .where(and_(date_start <= Goods.date, Goods.date <= date_end))
+    )
     return [Product(*el) for el in coon.execute(stmt).fetchall()]

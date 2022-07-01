@@ -18,7 +18,7 @@ logger_config = {
             "class": "logging.FileHandler",
             "level": "DEBUG",
             "formatter": "app_format",
-            "filename": "logger.log",
+            "filename": "log",
         }
     },
     "loggers": {
@@ -42,6 +42,7 @@ logging.config.dictConfig(logger_config)
 log_route = logging.getLogger("route")
 log_validator = logging.getLogger("validator")
 log_db = logging.getLogger("database")
+
 
 if __name__ == "__main__":
     log_route.debug("Route logger.")

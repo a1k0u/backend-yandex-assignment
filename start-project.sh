@@ -1,5 +1,16 @@
 #!/bin/bash
 
+<< StartProjectDoc
+  For ubuntu users:
+  - Exports all environmental variables,
+  - creates virtual env from python,
+  - installs all dependencies for project,
+  - downloads Postgres,
+  - opens console of DB where user have to insert commands
+    which will be in stdout, user should copy and paste it.
+  - creates tables in DB.
+StartProjectDoc
+
 LOG="\033[41m\033[30m[LOG]:\033[0m"
 LINE="\033[42m\033[30m---------------------------------------------------------------\033[0m"
 
